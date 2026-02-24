@@ -1,0 +1,9 @@
+---
+- name: Installation des outils (docker, k3d, kubectl)
+  ansible.builtin.include_tasks: install.yml
+
+- name: Création et configuration du cluster k3d
+  ansible.builtin.include_tasks: cluster.yml
+
+- name: Déploiement de l'application NGINX
+  ansible.builtin.include_tasks: deploy.yml

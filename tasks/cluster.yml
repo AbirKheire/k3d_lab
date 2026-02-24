@@ -1,0 +1,30 @@
+---
+- name: Vérifier si le cluster existe déjà
+  ansible.builtin.command: k3d cluster list -o json
+  register: cluster_list
+  changed_when: false
+
+- name: Créer le cluster k3d (1 serveur + 1 agent)
+  ansible.builtin.command: >
+    k3d cluster create {{ k3d_cluster_name }}
+    --servers 1
+    --agents 1
+    --port "{{ k3d_nodeport }}:{{ k3d_nodeport }}@server:0"
+    --wait
+  when: k3d_cluster_name not in cluster_list.stdout
+
+- name: Créer le répertoire .kube
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: '0700'
+
+- name: Récupérer le kubeconfig dans ~/.kube/config
+  ansible.builtin.shell: k3d kubeconfig get {{ k3d_cluster_name }} > /root/.kube/config
+  changed_when: true
+
+- name: Attendre que les nœuds soient prêts
+  ansible.builtin.command: kubectl wait --for=condition=Ready nodes --all --timeout=120s
+  environment:
+    KUBECONFIG: /root/.kube/config
+  changed_when: false

@@ -1,0 +1,37 @@
+---
+- name: Vérifier si docker est disponible
+  ansible.builtin.command: docker info
+  register: docker_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Installer docker.io si absent
+  ansible.builtin.apt:
+    name: docker.io
+    state: present
+    update_cache: true
+  when: docker_check.rc != 0
+
+- name: Vérifier si k3d est installé
+  ansible.builtin.command: k3d version
+  register: k3d_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Installer k3d
+  ansible.builtin.shell: |
+    curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+  when: k3d_check.rc != 0
+
+- name: Vérifier si kubectl est installé
+  ansible.builtin.command: kubectl version --client
+  register: kubectl_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Installer kubectl
+  ansible.builtin.shell: |
+    curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    rm -f kubectl
+  when: kubectl_check.rc != 0

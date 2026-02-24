@@ -1,0 +1,3 @@
+---
+k3d_cluster_name: "k3d-lab"
+k3d_nodeport: 30080

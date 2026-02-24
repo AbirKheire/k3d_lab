@@ -1,0 +1,17 @@
+galaxy_info:
+  author: AbirKheire
+  description: "Déploiement cluster Kubernetes k3d avec Nginx sur Ubuntu"
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+  galaxy_tags:
+    - k3d
+    - kubernetes
+    - nginx
+    - docker
+
+dependencies: []
